@@ -92,4 +92,8 @@ class VanillaBehaviors extends Plugin implements PluginEvents {
   }
 }
 
-export default new VanillaBehaviors();
+// Create a new instance of the plugin
+const plugin = new VanillaBehaviors();
+
+// Export the plugin instance
+export default plugin;
