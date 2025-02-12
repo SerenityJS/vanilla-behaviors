@@ -37,6 +37,13 @@ interface BlockTypeComponents {
     size: [number, number, number],
     origin?: [number, number, number]
   };
+  "minecraft:transformation": {
+    rotation: [number, number, number],
+    translation: [number, number, number],
+    scale: [number, number, number]
+    rotation_pivot: [number, number, number]
+    scale_pivot: [number, number, number]
+  };
 }
 
 interface BlockTypePermutation {

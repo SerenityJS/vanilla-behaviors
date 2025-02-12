@@ -25,7 +25,7 @@
     "Example"
   ],
   "peerDependencies": {
-    "@serenityjs/core": "^0.7.2-beta-20250210173539",
+    "@serenityjs/core": "^0.7.2-beta-20250211043620",
     "@serenityjs/plugins": "*"
   },
   "devDependencies": {
