@@ -1,14 +1,16 @@
 import { BlockPermutation, BlockType, BlockTypeCollisionBoxComponent, BlockTypeGeometryComponent, BlockTypeMaterialInstancesComponent, BlockTypeSelectionBoxComponent, BlockTypeTransformationComponent, CustomBlockType } from "@serenityjs/core";
-import { BlockTypeComponents, BlockTypeDefinition } from "./json";
-import plugin from "../index";
 import { MaterialRenderMethod } from "@serenityjs/protocol";
+import { BlockComponents, BlockTypeDefinition } from "../types";
 
 class JsonBlockType extends CustomBlockType {
   protected readonly json: BlockTypeDefinition;
 
   public constructor(json: BlockTypeDefinition) {
+    // Get the identifier from the JSON data
+    const identifier = json["minecraft:block"].description.identifier;
+
     // Call the parent constructor with the block identifier
-    super(json["minecraft:block"].description.identifier, {});
+    super(identifier, {});
 
     // Assign the JSON data to the instance
     this.json = json;
@@ -70,80 +72,60 @@ class JsonBlockType extends CustomBlockType {
 
   protected loadComponents(
     context: BlockType | BlockPermutation,
-    components: BlockTypeComponents
+    components: BlockComponents
   ): void {
-    // Check if the component group contains custom components
-    // if (components["minecraft:custom_components"])
-    //   // Log a warning message to the console
-    //   plugin.logger.warn(`Block type §3${this.identifier}§r has custom components, which requires the vanilla Scripting API. These functionalities will need to be implemented manually via a BlockTrait within an external plugin.`);
-
-    // Check if the component group contains a collision box definition
+    // Check if the components contain the geometry component
     if (components["minecraft:collision_box"]) {
-      // Get the collision box component definition
+      // Get the geometry component
       const definition = components["minecraft:collision_box"];
 
-      // Add the collision box component to the block type
-      const component = context.components.add(BlockTypeCollisionBoxComponent, {});
-
-      // Check if the definition has a size or origin
-      if (definition.size) component.size = definition.size;
-      if (definition.origin) component.origin = definition.origin;
-      else component.origin = [-8, 0, -8]; // Vanilla default
+      // Check if the definition is a geometry component
+      if (typeof definition === "boolean") {
+        // Check if the definition if the collision box is true or false
+        if (definition) context.components.setCollisionBox(); // Default collision box
+        else context.components.setCollisionBox({ origin: [0, 0, 0], size: [0, 0, 0] }); // No collision box
+      } else {
+        // Assign the geometry options to the collision box component
+        context.components.setCollisionBox(definition)
+      }
     }
 
-    // Check if the component group contains a selection box definition
+    // Check if the components contain the selection box component
     if (components["minecraft:selection_box"]) {
-      // Get the selection box component definition
+      // Get the selection box component
       const definition = components["minecraft:selection_box"];
 
-      // Add the selection box component to the block type
-      const component = context.components.add(BlockTypeSelectionBoxComponent, {});
-
-      // Check if the definition has a size or origin
-      if (definition.size) component.size = definition.size;
-      if (definition.origin) component.origin = definition.origin;
-      else component.origin = [-8, 0, -8]; // Vanilla default
+      // Check if the definition is a geometry component
+      if (typeof definition === "boolean") {
+        // Check if the definition if the selection box is true or false
+        if (definition) context.components.setSelectionBox(); // Default selection box
+        else context.components.setSelectionBox({ origin: [0, 0, 0], size: [0, 0, 0] }); // No selection box
+      } else {
+        // Assign the geometry options to the selection box component
+        context.components.setSelectionBox(definition)
+      }
     }
 
-    // Check if the component group contains a geometry definition
+    // Check if the components contain a crafting table component
+    if (components["minecraft:crafting_table"]) {
+      // Get the crafting table component
+      const definition = components["minecraft:crafting_table"];
+
+      // Set the crafting table component
+      context.components.setCraftingTable(definition);
+    }
+
+    // Check if the components contain a geometry component
     if (components["minecraft:geometry"]) {
-      // Get the geometry component definition
+      // Get the geometry component
       const definition = components["minecraft:geometry"];
 
-      // Add the geometry component to the block type
-      const component = new BlockTypeGeometryComponent(context, { culling: "" });
-
-      // Check if the definition has an identifier
-      if (typeof definition === 'string') component.model = definition;
-      else component.model = definition.identifier;
-    }
-
-    // Check if the component group contains a transformation definition
-    if (components["minecraft:transformation"]) {
-      // Get the transformation component definition
-      const definition = components["minecraft:transformation"];
-
-      // Add the transformation component to the block type
-      context.components.add(BlockTypeTransformationComponent, definition);
-    }
-
-    // Check if the component group contains material instances
-    if (components["minecraft:material_instances"]) {
-      // Get the material instances component definition
-      const definition = components["minecraft:material_instances"];
-
-      // Add the material instances component to the block type
-      const component = context.components.add(BlockTypeMaterialInstancesComponent, {});
-
-      // Iterate over the material instances
-      for (const [name, instance] of Object.entries(definition)) {
-        // Add the material instance to the component
-        component.createMaterialInstance(name, {
-          texture: instance.texture,
-          render_method: instance.render_method as MaterialRenderMethod,
-          ambient_occlusion: instance?.ambient_occlusion ?? false,
-          face_dimming: instance?.face_dimming ?? false
-        });
+      // Check if the definition is a geometry component
+      if (typeof definition === "string") {
+        context.components.setGeometry({ identifier: definition });
+      } else {
+        // Assign the geometry options to the geometry component
+        context.components.setGeometry(definition);
       }
     }
   }
