@@ -29,7 +29,7 @@ class VanillaBehaviors extends Plugin implements PluginEvents {
       for (const [, world] of this.serenity.worlds) {
         // Register all the block types in the behavior pack
         for (const type of pack.blocks) world.blockPalette.registerType(type);
-
+      
         // Register all the item types in the behavior pack
         for (const type of pack.items) world.itemPalette.registerType(type);
       }
@@ -78,8 +78,11 @@ class VanillaBehaviors extends Plugin implements PluginEvents {
       // Read the manifest buffer
       const buffer = readFileSync(resolve(this.packsPath, path, "manifest.json"));
 
+      // Remove any comments from the buffer
+      const filtered = buffer.toString().replace(/\/\/.*$/gm, "");
+
       // Parse the buffer into an object
-      const manifest = JSON.parse(buffer.toString()) as BehaviorPackManifest;
+      const manifest = JSON.parse(filtered) as BehaviorPackManifest;
 
       // Create a new behavior pack instance
       const pack = new BehaviorPack(path, manifest);

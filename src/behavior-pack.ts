@@ -1,11 +1,11 @@
 import { readdirSync, readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { join, resolve } from "node:path";
 
-import { BlockType, BlockTypeFrictionComponent, BlockTypeHardnessComponent, CustomBlockType, CustomItemType, ItemType } from "@serenityjs/core";
+import { BlockType, CustomItemType, ItemType } from "@serenityjs/core";
 
-import { BehaviorPackManifest } from "./types";
+import { BehaviorPackManifest, BlockTypeDefinition } from "./types";
+import { JsonBlockType } from "./block";
 import { CreativeItemCategory } from "@serenityjs/protocol";
-import { BlockTypeDefinition, JsonBlockType } from "./block";
 
 class BehaviorPack {
   /**
@@ -60,57 +60,28 @@ class BehaviorPack {
      // Attempt to read the block definition
      try {
         // Read the block definition buffer
-        const buffer = readFileSync(resolve(this.path, "blocks", definition.name));
+        const buffer = readFileSync(resolve(this.path, path, definition.name));
         const json = JSON.parse(buffer.toString()) as BlockTypeDefinition;
 
         // Create a new block type instance using the JSON data
         const blockType = new JsonBlockType(json);
 
-        // // Get the description and components of the block
-        // const { description, components, permutations } = block["minecraft:block"];
+        const itemType = new CustomItemType(blockType.identifier, { blockType });
+        itemType.creativeCategory = CreativeItemCategory.Construction;
 
-        // // Check if the block type already exists
-        // if (BlockType.types.has(description.identifier)) continue;
-
-        // // Create a new block type and item type
-        // const blockType = new CustomBlockType(description.identifier);
-        // const itemType = new CustomItemType(description.identifier, { blockType });
-
-        // // Check if the block should be registered to the creative menu
-        // if (description?.register_to_creative_menu || description?.menu_category) {
-        //   itemType.creativeCategory = CreativeItemCategory.Construction; // TODD
-        //   itemType.creativeGroup = description?.menu_category?.group ?? `itemGroup.name.${blockType.identifier}`;
-        // }
-
-        // // Check if there are any permutations
-        // if (!permutations || permutations.length === 0) blockType.createPermutation({}) // Default permutation
-        // else {
-        //   for (const permutation of permutations) {
-        //     console.log("TODO: ", permutation);
-        //   }
-        // }
-
-        // // Check if the definition has a friction component
-        // if (components?.["minecraft:friction"]) {
-        //   // Add the friction component to the block type
-        //   blockType.components.add(BlockTypeFrictionComponent, components["minecraft:friction"]);
-        // }
-
-        // // Add the block type to the set
-        // if (components?.["minecraft:destroy_time"]) {
-        //   blockType.components.add(BlockTypeHardnessComponent, components["minecraft:destroy_time"]);
-        // }
-
-        // // Add the block type & item type to the set
+        // Add the block type & item type to the set
         this.blocks.add(blockType);
-        // this.items.add(itemType);
-     } catch (error) { console.error(error); }; 
+        this.items.add(itemType);
+     } catch (error) {
+        // Log an error message if the block definition could not be read
+        console.error(`Failed to read block definition: ${definition.name}`, (error as Error).message);
+      }
     }
 
     // Iterate over each directory
-    for (const directory of directories)
-      // Read all the blocks in the directory
-      this.readAllBlocks(resolve(path, directory.name));
+    for (const directory of directories) {
+      this.readAllBlocks(join(path, directory.name)); // Recursively read blocks in subdirectories
+    }
   }
 }
 

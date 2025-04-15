@@ -1,5 +1,4 @@
-import { BlockPermutation, BlockType, BlockTypeCollisionBoxComponent, BlockTypeGeometryComponent, BlockTypeMaterialInstancesComponent, BlockTypeSelectionBoxComponent, BlockTypeTransformationComponent, CustomBlockType } from "@serenityjs/core";
-import { MaterialRenderMethod } from "@serenityjs/protocol";
+import { BlockPermutation, BlockType, CustomBlockType } from "@serenityjs/core";
 import { BlockComponents, BlockTypeDefinition } from "../types";
 
 class JsonBlockType extends CustomBlockType {
@@ -23,8 +22,6 @@ class JsonBlockType extends CustomBlockType {
       // Parse the block state from the query
       const state = this.parseStateFromQuery(definition.condition);
 
-      console.log(this.identifier, state);
-
       // Create a new permutation with the block state
       const permutation = this.createPermutation(state);
 
@@ -39,11 +36,10 @@ class JsonBlockType extends CustomBlockType {
 
   protected parseStateFromQuery(query: string): Record<string, boolean | string | number> {
     // Create a regular expression to match the block state conditions
-    const regex = /q\.block_state\('([^']+)'\)\s*==\s*(true|false|'[^']+'|\d+(?:\.\d+)?)/g;
+    const regex = /(?:query|q)\.block_state\('([^']+)'\)\s*==\s*(true|false|'[^']+'|\d+(?:\.\d+)?)/g;
   
     // Prepare an object to store the conditions
     const conditions: Record<string, boolean | string | number> = {};
-
   
     // Iterate over the matches
     let match: RegExpExecArray | null;
@@ -74,6 +70,11 @@ class JsonBlockType extends CustomBlockType {
     context: BlockType | BlockPermutation,
     components: BlockComponents
   ): void {
+    // Check if the components contain a custom component
+    if (components["minecraft:custom_components"]) {
+      context.components.setIsInteractable(true); // Set the block as interactable
+    }
+
     // Check if the components contain the geometry component
     if (components["minecraft:collision_box"]) {
       // Get the geometry component
@@ -127,6 +128,32 @@ class JsonBlockType extends CustomBlockType {
         // Assign the geometry options to the geometry component
         context.components.setGeometry(definition);
       }
+    }
+
+    // Check if the components contain a material instances component
+    if (components["minecraft:material_instances"]) {
+      // Get the material instances component
+      const definition = components["minecraft:material_instances"];
+
+      for (const [key, value] of Object.entries(definition)) {
+        // Check if the definition is a geometry component
+        if (!value || typeof value === "string") continue; // Not sure but this condition is here
+
+        // Get the material instance component
+        const component = context.components.getMaterialInstances()
+
+        // Create a new material instance with the key and value
+        component.createMaterialInstance(key, value);
+      }
+    }
+
+    // Check if the components contain a transformation component
+    if (components["minecraft:transformation"]) {
+      // Get the transformation component
+      const definition = components["minecraft:transformation"];
+
+      // Set the transformation component
+      context.components.setTransformation(definition);
     }
   }
 }
