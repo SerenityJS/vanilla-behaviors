@@ -7,7 +7,8 @@
   "module": "dist/index.mjs",
   "license": "MIT",
   "scripts": {
-    "build": "tsup"
+    "build": "tsup",
+    "watch": "tsup --watch"
   },
   "tsup": {
     "entry": [
@@ -25,15 +26,15 @@
     "Example"
   ],
   "peerDependencies": {
-    "@serenityjs/core": "^0.8.0-beta-20250414163425",
-    "@serenityjs/plugins": "*"
+    "@serenityjs/core": "^0.8.7-beta-20250803052357",
+    "@serenityjs/plugins": "^0.8.6"
   },
   "devDependencies": {
-    "tsup": "^8.3.5",
-    "typescript": "^5.6.3"
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@serenityjs/protocol": "^0.7.2-beta-20250207163223",
-    "@types/node": "^22.13.1"
+    "@serenityjs/protocol": "^0.8.6",
+    "@types/node": "^24.0.14"
   }
 }

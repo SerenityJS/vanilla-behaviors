@@ -11,7 +11,7 @@ class VanillaBehaviors extends Plugin implements PluginEvents {
   /**
    * The path to the behavior packs folder
   */
-  public packsPath = resolve(process.cwd(), "behavior_packs");
+  public packsPath = resolve(process.cwd(), "behaviors");
 
   /**
    * The behavior packs loaded by the plugin
@@ -20,6 +20,9 @@ class VanillaBehaviors extends Plugin implements PluginEvents {
 
   public constructor() {
     super("vanilla-behaviors", "1.0.0");
+
+    // Set the logger properties
+    this.logger.name = "Behaviors";
   }
 
   public onStartUp(): void {
@@ -61,7 +64,16 @@ class VanillaBehaviors extends Plugin implements PluginEvents {
         continue;
       }
 
-      pack.readAllBlocks("blocks");
+      // Check if the pack contains a blocks directory
+      if (existsSync(resolve(pack.path, "blocks")))
+        pack.readAllBlocks("blocks"); // Read all the blocks in the behavior pack
+
+      // Check if the pack contains an items directory
+      if (existsSync(resolve(pack.path, "items")))
+        pack.readAllItems("items"); // Read all the items in the behavior pack
+
+      // Log a message indicating the behavior pack was loaded successfully
+      this.logger.info(`Loaded behavior pack: ${pack.manifest.header.name} (${pack.manifest.header.uuid})`);
 
       // Add the behavior pack to the loaded behavior packs
       this.behaviorPacks.add(pack);
