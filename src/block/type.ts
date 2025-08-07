@@ -2,7 +2,10 @@ import { BlockPermutation, BlockType, CustomBlockType } from "@serenityjs/core";
 import { BlockComponents, BlockTypeDefinition } from "../types";
 
 class JsonBlockType extends CustomBlockType {
-  protected readonly json: BlockTypeDefinition;
+  /**
+   * The JSON definition of the block type.
+  */
+  public readonly json: BlockTypeDefinition;
 
   public constructor(json: BlockTypeDefinition) {
     // Get the identifier from the JSON data
@@ -68,7 +71,7 @@ class JsonBlockType extends CustomBlockType {
 
   protected loadComponents(
     context: BlockType | BlockPermutation,
-    components: BlockComponents
+    components: Partial<BlockComponents>
   ): void {
     // Check if the components contain a custom component
     if (components["minecraft:custom_components"]) {
@@ -154,6 +157,48 @@ class JsonBlockType extends CustomBlockType {
 
       // Set the transformation component
       context.components.setTransformation(definition);
+    }
+
+    // Check if the components contain a "minecraft:destructible_by_mining" component
+    if (components["minecraft:destructible_by_mining"]) {
+      // Get the destructible by mining component
+      const definition = components["minecraft:destructible_by_mining"];
+
+      // Check if the definition is a destructible by mining component
+      if (typeof definition === "boolean") {
+        // If it's a boolean, set the destructible by mining component
+        context.components.setHardness(definition ? 1 : 0);
+      } else {
+        // If it's an object, set the destructible by mining component with options
+        context.components.setHardness(definition.seconds_to_destroy ?? 1);
+      }
+    }
+
+    // Check if the components contain a "minecraft:display_name" component
+    if (components["minecraft:display_name"]) {
+      // Get the display name component
+      const definition = components["minecraft:display_name"];
+
+      // Set the display name component
+      context.components.setDisplayName(definition);
+    }
+
+    // Check if the components contain a "minecraft:light_emission" component
+    if (components["minecraft:light_emission"]) {
+      // Get the light emission component
+      const definition = components["minecraft:light_emission"];
+
+      // Set the light emission component
+      context.components.setLightEmission(definition);
+    }
+
+    // Check if the components contain a "minecraft:friction" component
+    if (components["minecraft:friction"]) {
+      // Get the friction component
+      const definition = components["minecraft:friction"];
+
+      // Set the friction component
+      context.components.setFriction(definition);
     }
   }
 }

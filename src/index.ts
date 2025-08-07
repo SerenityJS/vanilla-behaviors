@@ -11,7 +11,7 @@ class VanillaBehaviors extends Plugin implements PluginEvents {
   /**
    * The path to the behavior packs folder
   */
-  public packsPath = resolve(process.cwd(), "behaviors");
+  public packsPath = resolve(process.cwd(), "behavior_packs");
 
   /**
    * The behavior packs loaded by the plugin
@@ -35,6 +35,9 @@ class VanillaBehaviors extends Plugin implements PluginEvents {
       
         // Register all the item types in the behavior pack
         for (const type of pack.items) world.itemPalette.registerType(type);
+
+        // Register all the entity types in the behavior pack
+        for (const type of pack.entities) world.entityPalette.registerType(type);
       }
     }
   }
@@ -71,6 +74,10 @@ class VanillaBehaviors extends Plugin implements PluginEvents {
       // Check if the pack contains an items directory
       if (existsSync(resolve(pack.path, "items")))
         pack.readAllItems("items"); // Read all the items in the behavior pack
+
+      // Check if the pack contains an entities directory
+      if (existsSync(resolve(pack.path, "entities")))
+        pack.readAllEntities("entities");
 
       // Log a message indicating the behavior pack was loaded successfully
       this.logger.info(`Loaded behavior pack: ${pack.manifest.header.name} (${pack.manifest.header.uuid})`);

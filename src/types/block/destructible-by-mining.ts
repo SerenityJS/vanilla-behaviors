@@ -1,7 +1,7 @@
 interface DestructibleByMiningOptions {
-    seconds_to_destroy: number;
-  }
+  seconds_to_destroy: number;
+}
   
-  type DestructibleByMiningComponent = DestructibleByMiningOptions | boolean;
+type DestructibleByMiningComponent = DestructibleByMiningOptions | boolean;
   
-  export type { DestructibleByMiningComponent };
+export type { DestructibleByMiningComponent };

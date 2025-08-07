@@ -8,17 +8,18 @@ import type { MaterialInstancesComponent } from "./material-instances";
 import type { TransformationComponent } from "./transformation";
 
 interface BlockComponents {
-  "minecraft:custom_components"?: Array<string>;
-  "minecraft:collision_box"?: Partial<CollisionBoxComponent>;
-  "minecraft:selection_box"?: Partial<SelectionBoxComponent>;
-  "minecraft:crafting_table"?: Partial<CraftingTableComponent>;
-  "minecraft:destructible_by_explosion"?: Partial<DestructibleByExplosionComponent>;
-  "minecraft:destructible_by_mining"?: Partial<DestructibleByMiningComponent>;
-  "minecraft:display_name"?: string;
-  "minecraft:friction"?: number;
-  "minecraft:geometry"?: Partial<GeometryComponent>;
-  "minecraft:material_instances"?: Partial<MaterialInstancesComponent>;
-  "minecraft:transformation"?: Partial<TransformationComponent>;
+  "minecraft:custom_components": Array<string>;
+  "minecraft:collision_box": Partial<CollisionBoxComponent> | boolean;
+  "minecraft:selection_box": Partial<SelectionBoxComponent> | boolean;
+  "minecraft:crafting_table": Partial<CraftingTableComponent>;
+  "minecraft:destructible_by_explosion": Partial<DestructibleByExplosionComponent> | boolean;
+  "minecraft:destructible_by_mining": Partial<DestructibleByMiningComponent> | boolean;
+  "minecraft:display_name": string;
+  "minecraft:friction": number;
+  "minecraft:light_emission": number;
+  "minecraft:geometry": Partial<GeometryComponent>;
+  "minecraft:material_instances": Partial<MaterialInstancesComponent>;
+  "minecraft:transformation": Partial<TransformationComponent>;
 }
 
 export type { BlockComponents };

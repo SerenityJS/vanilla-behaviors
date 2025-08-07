@@ -16,6 +16,7 @@ interface ItemTypeComponents {
   "minecraft:max_stack_size": number;
   "minecraft:food": Partial<ItemFoodOptions>;
   "minecraft:use_modifiers": Partial<ItemUseModifiersOptions>;
+  "minecraft:damage": number;
 }
 
 export type { ItemTypeComponents };

@@ -6,7 +6,7 @@ class JsonItemType extends CustomItemType {
   /**
    * The JSON definition of the item type.
   */
-  protected readonly json: ItemTypeDefinition;
+  public readonly json: ItemTypeDefinition;
 
   public constructor(json: ItemTypeDefinition) {
     // Get the identifier from the JSON data
@@ -196,6 +196,15 @@ class JsonItemType extends CustomItemType {
 
       // Set the use modifiers options in the item type components
       context.components.setUseModifiers(definition);
+    }
+
+    // Check if the components contain the "minecraft:damage" component
+    if (components["minecraft:damage"]) {
+      // Get the damage value from the components
+      const damage = components["minecraft:damage"];
+
+      // Set the damage value in the item type components
+      context.components.setDamage(damage);
     }
   }
 }

@@ -1,12 +1,13 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
-import { BlockType, CustomItemType, ItemType } from "@serenityjs/core";
+import { BlockType, CustomItemType, EntityType, ItemType } from "@serenityjs/core";
 
-import { BehaviorPackManifest, BlockTypeDefinition, ItemTypeDefinition } from "./types";
+import { BehaviorPackManifest, BlockTypeDefinition, EntityTypeDefinition, ItemTypeDefinition } from "./types";
 import { JsonBlockType } from "./block";
 import { CreativeItemCategory } from "@serenityjs/protocol";
 import { JsonItemType } from "./item";
+import { JsonEntityType } from "./entity";
 
 class BehaviorPack {
   /**
@@ -40,6 +41,8 @@ class BehaviorPack {
 
   public readonly items: Set<ItemType> = new Set();
 
+  public readonly entities: Set<EntityType> = new Set();
+
   /**
    * Create a new behavior pack instance
    * @param path The path to the behavior pack directory
@@ -72,8 +75,44 @@ class BehaviorPack {
         // Create a new block type instance using the JSON data
         const blockType = new JsonBlockType(json);
 
+        // Create a new item type instance with the block type
         const itemType = new CustomItemType(blockType.identifier, { blockType });
-        itemType.creativeCategory = CreativeItemCategory.Construction;
+        
+        // Check if the block type has a description with a menu category
+        if (blockType.json["minecraft:block"].description.menu_category) {
+          // Get the creative item category from the JSON data
+          const { category, group } = blockType.json["minecraft:block"].description.menu_category;
+
+          // Check if the category is defined
+          if (category) switch(category) {
+            // Check the category and set the creative category accordingly
+            case "construction": {
+              itemType.creativeCategory = CreativeItemCategory.Construction;
+              break;
+            }
+
+            case "nature": {
+              itemType.creativeCategory = CreativeItemCategory.Nature;
+              break;
+            }
+
+            case "equipment": {
+              itemType.creativeCategory = CreativeItemCategory.Equipment;
+              break;
+            }
+
+            case "items": {
+              itemType.creativeCategory = CreativeItemCategory.Items;
+              break;
+            }
+          }
+
+          // Check if the group is defined
+          if (group) itemType.creativeGroup = group;
+        }
+
+        // Set the display name of the item type to match the block type
+        itemType.components.setDisplayName(blockType.components.getDisplayName());
 
         // Add the block type & item type to the set
         this.blocks.add(blockType);
@@ -122,6 +161,41 @@ class BehaviorPack {
     // Iterate over each directory
     for (const directory of directories) {
       this.readAllItems(join(path, directory.name)); // Recursively read items in subdirectories
+    }
+  }
+
+  public readAllEntities(path: string): void {
+    // Read all the files in the behavior pack directory
+    const files = readdirSync(resolve(this.path, path), { withFileTypes: true });
+    const json = files.filter(file => file.name.endsWith(".json"));
+    const directories = files.filter(file => file.isDirectory());
+
+    for (const definition of json) {
+      // Attempt to read the entity definition
+      try {
+        // Read the entity definition buffer
+        const buffer = readFileSync(resolve(this.path, path, definition.name));
+
+        // Remove any comments from the buffer
+        const filtered = buffer.toString().replace(/\/\/.*$/gm, "");
+
+        // Parse the buffer into a JSON object
+        const json = JSON.parse(filtered.toString()) as EntityTypeDefinition;
+
+        // Create a new entity type instance using the JSON data
+        const entityType = new JsonEntityType(json);
+
+        // Add the entity type to the set
+        this.entities.add(entityType);
+      } catch (error) {
+        // Log an error message if the entity definition could not be read
+        console.error(`Failed to read entity definition: ${definition.name}`, (error as Error).message);
+      }
+    }
+
+    // Iterate over each directory
+    for (const directory of directories) {
+      this.readAllEntities(join(path, directory.name)); // Recursively read entities in subdirectories
     }
   }
 }
