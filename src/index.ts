@@ -19,7 +19,7 @@ class VanillaBehaviors extends Plugin implements PluginEvents {
   public readonly behaviorPacks: Set<BehaviorPack> = new Set();
 
   public constructor() {
-    super("vanilla-behaviors", "1.0.0");
+    super("vanilla-behaviors", "0.1.0-beta");
 
     // Set the logger properties
     this.logger.name = "Behaviors";
