@@ -50,4 +50,9 @@
 - 📦 **[Custom Entities]**
   All entities defined in the subdirectories of the behavior packs are registered and made available in the game, while parsing and applying their properties and components as defined in the JSON files.
   - ⚙️ **[Supported Components]**
-    We currently don't support any entity components, but we are working to add support for them in future releases!
+    We are working continuously to expand the list of supported entity components. Currently, the following components are supported:
+    - `minecraft:collision_box`
+    - `minecraft:health`
+    - `minecraft:nameable`
+    - `minecraft:physics`
+    - `minecraft:scale`

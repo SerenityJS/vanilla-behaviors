@@ -4,6 +4,8 @@ import { resolve } from "node:path";
 import { Plugin, PluginEvents, PluginType } from "@serenityjs/plugins";
 import { BehaviorPackManifest } from "./types";
 import { BehaviorPack } from "./behavior-pack";
+import { EntitySpawnedSignal } from "@serenityjs/core";
+import { JsonEntityType } from "./entity";
 
 class VanillaBehaviors extends Plugin implements PluginEvents {
   public readonly type = PluginType.Addon;
@@ -19,7 +21,7 @@ class VanillaBehaviors extends Plugin implements PluginEvents {
   public readonly behaviorPacks: Set<BehaviorPack> = new Set();
 
   public constructor() {
-    super("vanilla-behaviors", "0.1.0-beta");
+    super("vanilla-behaviors", "0.1.1-beta");
 
     // Set the logger properties
     this.logger.name = "Behaviors";
@@ -111,6 +113,14 @@ class VanillaBehaviors extends Plugin implements PluginEvents {
     } catch (error) {
       return error as Error;
     };
+  }
+
+  public onEntitySpawned(signal: EntitySpawnedSignal): void {
+    // Check if the entity has a custom type
+    if (signal.entity.type instanceof JsonEntityType) {
+      // Load the components of the entity type
+      JsonEntityType.loadComponents(signal.entity, signal.entity.type.json["minecraft:entity"].components);
+    }
   }
 }
 
